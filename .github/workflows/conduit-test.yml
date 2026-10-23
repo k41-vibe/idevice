@@ -22,3 +22,25 @@ jobs:
       - name: Run conduit unit tests
         run: |
           cargo test -p idevice --features streaming_zip_conduit streaming_zip_conduit::
+
+      - name: Build a representative .app fixture
+        run: |
+          set -eux
+          root=fix/My.app
+          mkdir -p "$root/Frameworks/Foo.framework"
+          printf 'info' > "$root/Info.plist"          # standard 0644 file
+          printf '#!/bin/sh\necho hi\n' > "$root/My"   # executable, non-standard mode
+          chmod 755 "$root/My"
+          printf 'lib-bytes' > "$root/Frameworks/Foo.framework/Foo"
+          ln -s Foo "$root/Frameworks/Foo.framework/Current"   # symlink to a file
+
+      - name: Dump the Rust conduit stream
+        run: |
+          cargo run -q --example dump_conduit_stream --features streaming_zip_conduit -- fix/My.app > rust_stream.bin
+          ls -l rust_stream.bin
+
+      - name: Install the reference (pymobiledevice3)
+        run: pip install "pymobiledevice3==11.43.1"
+
+      - name: Compare Rust stream against the reference
+        run: python3 scripts/conduit_compare.py rust_stream.bin fix/My.app

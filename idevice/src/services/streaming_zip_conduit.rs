@@ -242,6 +242,15 @@ fn stream_bytes(entries: Vec<Entry>) -> Result<Vec<u8>, StreamingZipConduitError
     Ok(out)
 }
 
+/// Build the raw stream that `install_app` sends after the setup plist, for a local unpackaged
+/// `.app` directory. The stream is a zip with no compression and no central directory, opened by
+/// the metadata record and ended by the central-directory signature. Exposed so the byte format can
+/// be verified offline against the reference implementation without a device.
+pub fn app_stream_bytes(app: &Path) -> Result<Vec<u8>, IdeviceError> {
+    let entries = app_directory_entries(app)?;
+    stream_bytes(entries).map_err(|e| IdeviceError::UnexpectedResponse(e.to_string()))
+}
+
 /// Client for the streaming_zip_conduit service. Each instance performs a single transfer.
 pub struct StreamingZipConduitClient {
     pub idevice: Idevice,
@@ -274,9 +283,7 @@ impl StreamingZipConduitClient {
         developer: bool,
         mut progress: impl FnMut(u64),
     ) -> Result<(), IdeviceError> {
-        let entries = app_directory_entries(app)?;
-        let stream = stream_bytes(entries)
-            .map_err(|e| IdeviceError::UnexpectedResponse(e.to_string()))?;
+        let stream = app_stream_bytes(app)?;
 
         let package_type = if developer { "Developer" } else { "Customer" }.to_string();
         let media_subdir = format!("PublicStaging/idevice-{}.ipa", uuid::Uuid::new_v4());
