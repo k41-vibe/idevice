@@ -20,4 +20,5 @@ jobs:
       - uses: dtolnay/rust-toolchain@stable
 
       - name: Run conduit unit tests
-        run: cargo test -p idevice --features streaming_zip_conduit streaming_zip_conduit::
+        run: |
+          cargo test -p idevice --features streaming_zip_conduit streaming_zip_conduit::
