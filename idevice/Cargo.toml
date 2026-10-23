@@ -161,6 +161,7 @@ installation_proxy = [
   "async_zip/deflate",
 ]
 installcoordination_proxy = ["xpc"]
+streaming_zip_conduit = ["dep:uuid"]
 xctest = [
   "dvt",
   "installation_proxy",
@@ -281,6 +282,7 @@ full = [
   "house_arrest",
   "installation_proxy",
   "installcoordination_proxy",
+  "streaming_zip_conduit",
   "xctest",
   "location_simulation",
   "mdns",

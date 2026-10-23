@@ -1,0 +1,23 @@
+name: conduit-test
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [watch-sideload]
+
+jobs:
+  test:
+    name: streaming_zip_conduit unit tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install build dependencies
+        run: |
+          sudo apt-get update && sudo apt-get install -y \
+            build-essential cmake pkg-config
+
+      - uses: dtolnay/rust-toolchain@stable
+
+      - name: Run conduit unit tests
+        run: cargo test -p idevice --features streaming_zip_conduit streaming_zip_conduit::

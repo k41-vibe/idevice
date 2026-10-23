@@ -57,6 +57,8 @@ pub mod screenshotr;
 pub mod simulate_location;
 #[cfg(feature = "springboardservices")]
 pub mod springboardservices;
+#[cfg(feature = "streaming_zip_conduit")]
+pub mod streaming_zip_conduit;
 #[cfg(feature = "syslog_relay")]
 pub mod syslog_relay;
 #[cfg(feature = "wda")]
